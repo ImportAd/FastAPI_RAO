@@ -1,0 +1,16 @@
+# FastAPI + Uvicorn
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+
+# YAML parsing
+pyyaml>=6.0
+
+# COM automation (Windows only)
+pywin32>=306; sys_platform == "win32"
+
+# Morphological analysis (optional, for Russian declension)
+pymorphy2>=0.9.1
+
+# Utilities
+python-dotenv>=1.0.0
+python-multipart>=0.0.9
