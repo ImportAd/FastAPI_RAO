@@ -23,6 +23,7 @@ from app.routers import templates as templates_router
 from app.routers import generate as generate_router
 from app.routers import defaults as defaults_router
 from app.routers import admin as admin_router
+from app.routers import reports as reports_router
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,12 +73,14 @@ def create_app() -> FastAPI:
     defaults_router.defaults_store = defaults
     admin_router.templates = loaded_templates
     admin_router.generation_store = gen_store
+    reports_router._reports_path = cfg.base_dir / "data" / "reports.json"
 
     # Register routers
     app.include_router(templates_router.router)
     app.include_router(generate_router.router)
     app.include_router(defaults_router.router)
     app.include_router(admin_router.router)
+    app.include_router(reports_router.router)
 
     # Health check
     @app.get("/api/v1/health")
@@ -94,6 +97,27 @@ def create_app() -> FastAPI:
             StaticFiles(directory=str(cfg.generated_dir)),
             name="generated_files",
         )
+
+    # --- Static files: Flutter Web apps ---
+    # Admin panel: /admin/...
+    admin_static = cfg.base_dir / "static" / "admin"
+    if admin_static.exists():
+        app.mount(
+            "/admin",
+            StaticFiles(directory=str(admin_static), html=True),
+            name="admin_app",
+        )
+        logger.info(f"Admin panel mounted from {admin_static}")
+
+    # Main app: / (MUST be last — catches all unmatched routes)
+    main_static = cfg.base_dir / "static" / "main"
+    if main_static.exists():
+        app.mount(
+            "/",
+            StaticFiles(directory=str(main_static), html=True),
+            name="main_app",
+        )
+        logger.info(f"Main app mounted from {main_static}")
 
     logger.info(f"App ready. {len(loaded_templates)} templates, "
                 f"serving on {cfg.host}:{cfg.port}")
