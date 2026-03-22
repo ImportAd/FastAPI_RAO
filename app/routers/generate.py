@@ -32,6 +32,9 @@ generated_dir: str = "generated"
 _gen_semaphore = asyncio.Semaphore(1)
 
 FORMAKS_LD_TO_AKT = {
+    "fm_ld_ip_do_2017_POST": "fm_akt_ip_do_2017",
+    "fm_ld_ip_s_2017_POST": "fm_akt_ip_s_2017",
+    "fm_ld_ooo_POST": "fm_akt_OOO",
     "fm_ld_ip_do_2017": "fm_akt_ip_do_2017",
     "fm_ld_ip_do_2017_s": "fm_akt_ip_do_2017",
     "fm_ld_ip_s_2017": "fm_akt_ip_s_2017",
