@@ -1,9 +1,5 @@
 """
-main.py
--------
-FastAPI приложение для генерации документов.
-Заменяет Telegram-бота: те же YAML-шаблоны, та же COM-генерация,
-но через REST API вместо FSM.
+main.py — FastAPI приложение. Аутентификация, история документов, генерация.
 """
 from __future__ import annotations
 
@@ -15,125 +11,99 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.config import load_config
+from app.db.database import Database
+from app.services.auth import AuthService
 from app.services.templates_loader import load_templates
 from app.services.defaults_store import load_defaults_store
-from app.services.generation_store import load_generation_store
 
 from app.routers import templates as templates_router
 from app.routers import generate as generate_router
 from app.routers import defaults as defaults_router
 from app.routers import admin as admin_router
+from app.routers import auth as auth_router
+from app.routers import documents as documents_router
 from app.routers import reports as reports_router
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def create_app() -> FastAPI:
     cfg = load_config()
-
-    # Ensure directories exist
     cfg.generated_dir.mkdir(parents=True, exist_ok=True)
+    cfg.db_path.parent.mkdir(parents=True, exist_ok=True)
     cfg.defaults_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load templates from YAML
+    # Core services
     logger.info(f"Loading templates from {cfg.schema_path}")
     loaded_templates = load_templates(cfg.schema_path)
     logger.info(f"Loaded {len(loaded_templates)} templates")
 
-    # Load stores
+    db = Database(cfg.db_path)
+    auth = AuthService(cfg.jwt_secret)
     defaults = load_defaults_store(cfg.defaults_path)
-    gen_store = load_generation_store(cfg.generation_drafts_path)
 
-    # Create FastAPI app
-    app = FastAPI(
-        title="Document Generator API",
-        description="REST API для генерации документов по шаблонам. Замена Telegram-бота.",
-        version="1.0.0",
-    )
-
-    # CORS
+    # FastAPI
+    app = FastAPI(title="Document Generator API", version="2.0.0")
     app.add_middleware(
-        CORSMiddleware,
-        allow_origins=cfg.cors_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        CORSMiddleware, allow_origins=cfg.cors_origins,
+        allow_credentials=True, allow_methods=["*"], allow_headers=["*"],
     )
 
-    # Wire up shared state into routers
+    # Wire shared state
+    auth_router.db = db
+    auth_router.auth_service = auth
+    auth_router.admin_username = cfg.admin_username
+    auth_router.admin_password = cfg.admin_password
+
     templates_router.templates = loaded_templates
     generate_router.templates = loaded_templates
-    generate_router.generation_store = gen_store
+    generate_router.db = db
     generate_router.word_templates_dir = str(cfg.word_templates_dir)
     generate_router.generated_dir = str(cfg.generated_dir)
+
     defaults_router.defaults_store = defaults
+
+    documents_router.db = db
+
     admin_router.templates = loaded_templates
-    admin_router.generation_store = gen_store
+    admin_router.db = db
+    admin_router.defaults_store = defaults
+
     reports_router._reports_path = cfg.base_dir / "data" / "reports.json"
 
     # Register routers
+    app.include_router(auth_router.router)
     app.include_router(templates_router.router)
     app.include_router(generate_router.router)
     app.include_router(defaults_router.router)
+    app.include_router(documents_router.router)
     app.include_router(admin_router.router)
     app.include_router(reports_router.router)
 
-    # Health check
     @app.get("/api/v1/health")
     async def health():
-        return {
-            "status": "ok",
-            "templates_loaded": len(loaded_templates),
-        }
+        return {"status": "ok", "templates_loaded": len(loaded_templates)}
 
-    # Serve generated files for download (optional, for direct links)
+    # Static files
     if cfg.generated_dir.exists():
-        app.mount(
-            "/files",
-            StaticFiles(directory=str(cfg.generated_dir)),
-            name="generated_files",
-        )
+        app.mount("/files", StaticFiles(directory=str(cfg.generated_dir)), name="generated")
 
-    # --- Static files: Flutter Web apps ---
-    # Admin panel: /admin/...
     admin_static = cfg.base_dir / "static" / "admin"
     if admin_static.exists():
-        app.mount(
-            "/admin",
-            StaticFiles(directory=str(admin_static), html=True),
-            name="admin_app",
-        )
-        logger.info(f"Admin panel mounted from {admin_static}")
+        app.mount("/admin", StaticFiles(directory=str(admin_static), html=True), name="admin_app")
 
-    # Main app: / (MUST be last — catches all unmatched routes)
     main_static = cfg.base_dir / "static" / "main"
     if main_static.exists():
-        app.mount(
-            "/",
-            StaticFiles(directory=str(main_static), html=True),
-            name="main_app",
-        )
-        logger.info(f"Main app mounted from {main_static}")
+        app.mount("/", StaticFiles(directory=str(main_static), html=True), name="main_app")
 
-    logger.info(f"App ready. {len(loaded_templates)} templates, "
-                f"serving on {cfg.host}:{cfg.port}")
-
+    logger.info(f"Ready: {len(loaded_templates)} templates, auth enabled, DB at {cfg.db_path}")
     return app
 
 
 app = create_app()
 
-
 if __name__ == "__main__":
     import uvicorn
     cfg = load_config()
-    uvicorn.run(
-        "app.main:app",
-        host=cfg.host,
-        port=cfg.port,
-        reload=True,
-    )
+    uvicorn.run("app.main:app", host=cfg.host, port=cfg.port, reload=True)
