@@ -170,13 +170,19 @@ class Database:
         finally:
             conn.close()
 
+    def _row_to_user(self, row) -> User:
+        """Convert a DB row to User, properly handling is_active int→bool."""
+        d = dict(row)
+        d['is_active'] = bool(d.get('is_active', 1))
+        return User(**d)
+
     def get_user_by_username(self, username: str) -> Optional[User]:
         conn = self._conn()
         try:
             row = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
             if not row:
                 return None
-            return User(**dict(row), is_active=bool(row["is_active"]))
+            return self._row_to_user(row)
         finally:
             conn.close()
 
@@ -186,7 +192,7 @@ class Database:
             row = conn.execute("SELECT * FROM users WHERE id = ?", (user_id,)).fetchone()
             if not row:
                 return None
-            return User(**dict(row), is_active=bool(row["is_active"]))
+            return self._row_to_user(row)
         finally:
             conn.close()
 
@@ -194,7 +200,7 @@ class Database:
         conn = self._conn()
         try:
             rows = conn.execute("SELECT * FROM users ORDER BY created_at DESC").fetchall()
-            return [User(**dict(r), is_active=bool(r["is_active"])) for r in rows]
+            return [self._row_to_user(r) for r in rows]
         finally:
             conn.close()
 
@@ -282,6 +288,12 @@ class Database:
         finally:
             conn.close()
 
+    def _row_to_doc(self, row) -> DocumentRecord:
+        """Convert a DB row to DocumentRecord, properly handling is_auto_generated int→bool."""
+        d = dict(row)
+        d['is_auto_generated'] = bool(d.get('is_auto_generated', 0))
+        return DocumentRecord(**d)
+
     def get_user_documents(self, user_id: int, limit: int = 50,
                            include_auto: bool = False) -> List[DocumentRecord]:
         conn = self._conn()
@@ -293,7 +305,7 @@ class Database:
             sql += " ORDER BY created_at DESC LIMIT ?"
             params.append(limit)
             rows = conn.execute(sql, params).fetchall()
-            return [DocumentRecord(**dict(r), is_auto_generated=bool(r["is_auto_generated"])) for r in rows]
+            return [self._row_to_doc(r) for r in rows]
         finally:
             conn.close()
 
@@ -303,7 +315,7 @@ class Database:
             row = conn.execute("SELECT * FROM documents WHERE id = ?", (doc_id,)).fetchone()
             if not row:
                 return None
-            return DocumentRecord(**dict(row), is_auto_generated=bool(row["is_auto_generated"]))
+            return self._row_to_doc(row)
         finally:
             conn.close()
 
@@ -318,7 +330,7 @@ class Database:
             sql += " ORDER BY created_at DESC LIMIT ?"
             params.append(limit)
             rows = conn.execute(sql, params).fetchall()
-            return [DocumentRecord(**dict(r), is_auto_generated=bool(r["is_auto_generated"])) for r in rows]
+            return [self._row_to_doc(r) for r in rows]
         finally:
             conn.close()
 
