@@ -10,6 +10,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
+from starlette.middleware import Middleware
+from starlette.responses import Response
+
 from app.config import load_config
 from app.db.database import Database
 from app.services.auth import AuthService
@@ -84,6 +87,14 @@ def create_app() -> FastAPI:
     @app.get("/api/v1/health")
     async def health():
         return {"status": "ok", "templates_loaded": len(loaded_templates)}
+    
+     # --- No-cache middleware ---
+    @app.middleware("http")
+    async def no_cache_static(request, call_next):
+        response = await call_next(request)
+        if request.url.path.endswith(('.js', '.html')):
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        return response
 
     # Static files
     if cfg.generated_dir.exists():
