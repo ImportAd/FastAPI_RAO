@@ -3,6 +3,7 @@ from __future__ import annotations
 # asyncio: запуск блокирующей синхронной генерации в исполнителе (executor)
 import asyncio
 # time: вспомогательные средства для измерения времени/логирования, используемые при COM-вызовах
+import difflib
 import time
 # Десятичная математика для денежных значений
 from decimal import Decimal, InvalidOperation
@@ -30,6 +31,8 @@ except Exception:
     _MORPH = None
 
 from app.models.templates_models import DocumentTemplate
+
+
 
 
 """
