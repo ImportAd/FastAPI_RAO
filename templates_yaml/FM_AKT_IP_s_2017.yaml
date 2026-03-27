@@ -1,0 +1,92 @@
+code: fm_akt_ip_s_2017
+name: "Акт приема-передачи"
+file: "FM_AKT_IP_s_2017.docx"
+
+ui:
+  menu_title: "ФМ-АКТ-ИП с 2017"
+  description: "Формирование акта приема-передачи с ИП."
+  category: "ФорМакс"
+  subcategory: "Акты приема-передачи"
+# Эти поля присутствуют в шаблоне как теги, но пользователя по ним не спрашиваем
+# (они вычисляются из других значений)
+skip_fields:
+
+
+# Инлайн-значения по умолчанию для отдельных полей (показываются кнопками)
+field_defaults:
+  contract:
+    dov_num:
+      - "232-01/2026-АД"
+    dov_date:
+      - "14.01.2026"
+
+sections:
+  - id: contract
+    title: "Шапка соглашения"
+    fields:
+
+      - name: day
+        label: "Дата документа (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{DAY}}"
+          month: "{{MONTH}}"
+          year: "{{YEAR}}"
+
+      - name: dov_num
+        label: "Номер доверенности"
+        type: text
+        required: true
+        word_tag: "{{DOV_NUM}}"
+
+      - name: dov_date
+        label: "Дата доверенности (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{DOV_DATE}}"
+
+      - name: ip_fio
+        label: "ФИО индивидуального предпринимателя (полностью)"
+        type: text
+        required: true
+        text_handler: fio_full_and_initials
+        word_tags:
+          full: "{{IP_FIO}}"
+          initials: "{{FIO_SHORT}}"
+
+      - name: ip_date
+        label: "Лист записи ЕГРИП от (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{IP_DATE}}"
+
+      - name: ld_num
+        label: "Номер лицензионного договора"
+        type: text
+        required: true
+        word_tag: "{{LD_NUM}}"
+
+      - name: ld_day
+        label: "Дата лицензионного договора (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{LD_DAY}}"
+          month: "{{LD_MONTH}}"
+          year: "{{LD_YEAR}}"
+
+  - id: licensee_footer
+    title: "Реквизиты и подпись Лицензиата"
+    fields:
+
+      - name: ip_stamp_abbr
+        label: "Обозначение печати (обычно М.П.)"
+        type: text
+        required: false
+        default: "М.П."
+        word_tag: "{{IP_STAMP_ABBR}}"

@@ -1,0 +1,178 @@
+code: fm_sor_ooo_d
+name: "Соглашение к ЛД"
+file: "FM_SOR_OOO_d.docx"
+
+ui:
+  menu_title: "ФМ-СОР-ООО(без долга)"
+  description: "Формирование соглашения к лицензионному договору с ООО."
+  category: "ФорМакс"
+  subcategory: "СОР"
+# Эти поля присутствуют в шаблоне как теги, но пользователя по ним не спрашиваем
+# (они вычисляются из других значений)
+skip_fields:
+
+# Инлайн-значения по умолчанию для отдельных полей (показываются кнопками)
+field_defaults:
+  contract:
+    dov_num:
+      - "232-01/2026-АД"
+    dov_date:
+      - "14.01.2026"
+    ok:
+      - "ий"
+      - "его"
+    dolg:
+      - ""
+    oko:
+      - "ое"
+
+sections:
+  - id: contract
+    title: "Шапка соглашения"
+    fields:
+
+      - name: add_num
+        label: "Номер дополнительного соглашения"
+        type: text
+        required: true
+        word_tag: "{{ADD_NUM}}"
+
+      - name: ld_num
+        label: "Номер лицензионного договора"
+        type: text
+        required: true
+        word_tag: "{{LD_NUM}}"
+
+      - name: ld_day
+        label: "Дата лицензионного договора (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{LD_DAY}}"
+          month: "{{LD_MONTH}}"
+          year: "{{LD_YEAR}}"
+
+      - name: day
+        label: "Дата документа (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{DAY}}"
+          month: "{{MONTH}}"
+          year: "{{YEAR}}"
+
+      - name: dov_num
+        label: "Номер доверенности"
+        type: text
+        required: true
+        word_tag: "{{DOV_NUM}}"
+
+      - name: dov_date
+        label: "Дата доверенности (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{DOV_DATE}}"
+
+      - name: form 
+        label: "Форма собственности (ООО, ЗАО и т.д. в полной форме)"
+        type: text
+        required: true
+        text_handler: org_form_full_and_abbr
+        word_tags: 
+          full: "{{FORM}}"
+          abbr: "{{FORM_S}}"
+
+      - name: ooo_name
+        label: "Наименование юр. лица в кавычках"
+        type: text
+        required: true
+        word_tag: "{{OOO_NAME}}"
+      
+      - name: oko
+        label: "именуем(__)"
+        type: text
+        required: true
+        word_tag: "{{OKO}}"
+
+      - name: dol
+        label: "Должность в именительном падеже"
+        type: text
+        required: true
+        text_handler: position_nom_and_gen
+        word_tags: 
+          gen: "{{DOL_GEN}}"
+          nom: "{{DOL}}"
+
+      - name: fio_ooo
+        label: "В лице: ФИО в именительном падеже"
+        type: text
+        required: true
+        text_handler: fio_full_and_initials
+        word_tags:
+          full: "{{FIO_OOO}}"
+          initials: "{{FIO_SHORT}}"
+          gen: "{{FIO_GEN}}"
+
+      - name: ok
+        label: "действующ(__), выберите окончание"
+        type: text
+        required: true
+        word_tag: "{{OK}}"
+
+      - name: osnovanie
+        label: "«Лицензиат» действующий на основании"
+        type: text
+        required: true
+        word_tag: "{{OSNOVANIE}}"
+
+      - name: rast
+        label: "Расторгнуть Договор с (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{R_DAY}}"
+          month: "{{R_MONTH}}"
+          year: "{{R_YEAR}}"
+
+      - name: prekr
+        label: "Права и обязанности прекращаются с (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{P_DAY}}"
+          month: "{{P_MONTH}}"
+          year: "{{P_YEAR}}"
+
+  - id: licensee_footer
+    title: "Реквизиты и подпись Лицензиата"
+    fields:
+
+      - name: ogrn
+        label: "ОГРН"
+        type: text
+        required: true
+        word_tag: "{{OGRN}}"
+
+      - name: inn
+        label: "ИНН ИП"
+        type: text
+        required: true
+        word_tag: "{{INN}}"
+
+      - name: address
+        label: "Место нахождения (адрес ИП)"
+        type: text
+        required: true
+        word_tag: "{{ADDRESS}}"
+
+      - name: ip_stamp_abbr
+        label: "Обозначение печати (обычно М.П.)"
+        type: text
+        required: false
+        default: "М.П."
+        word_tag: "{{IP_STAMP_ABBR}}"

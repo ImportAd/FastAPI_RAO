@@ -1,0 +1,265 @@
+code: rao_ld_ip_s_2017_gi
+name: "Лицензионный договор с ИП"
+file: "RAO_LD_IP_s_2017_GI.docx"
+
+ui:
+  menu_title: "РАО-ЛД-ИП-с-2017 (живое исполнение)"
+  description: "Формирование лицензионного договора с ИП"
+  category: "РАО"
+  subcategory: "Лицензионные договоры"
+# Эти поля присутствуют в шаблоне как теги, но пользователя по ним не спрашиваем
+# (они вычисляются из других значений)
+skip_fields:
+
+
+# Инлайн-значения по умолчанию для отдельных полей (показываются кнопками)
+field_defaults:
+  contract:
+    dov_num:
+      - "АД-1116/0195/1/26-66"
+    dov_date:
+      - "14.01.2026"
+
+sections:
+  - id: contract
+    title: "Содержание лицензионного договора"
+    fields:
+
+      - name: ld_num
+        label: "Номер лицензионного договора"
+        type: text
+        required: true
+        word_tag: "{{LD_NUM}}"
+
+      - name: ld_day
+        label: "Дата лицензионного договора (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{LD_DAY}}"
+          month: "{{LD_MONTH}}"
+          year: "{{LD_YEAR}}"
+
+      - name: day
+        label: "Дата документа (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{DAY}}"
+          month: "{{MONTH}}"
+          year: "{{YEAR}}"
+
+      - name: dov_num
+        label: "Номер доверенности"
+        type: text
+        required: true
+        word_tag: "{{DOV_NUM}}"
+
+      - name: dov_date
+        label: "Дата доверенности (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{DOV_DATE}}"
+
+      - name: ip_fio
+        label: "ФИО индивидуального предпринимателя (полностью)"
+        type: text
+        required: true
+        text_handler: fio_full_and_initials
+        word_tags:  
+          full: "{{IP_FIO}}"
+          initials: "{{FIO_SHORT}}"
+
+      - name: ip_date
+        label: "Лист записи ЕГРИП от (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{IP_DATE}}"
+
+      - name: punkt
+        label: "Авторское вознаграждение рассчитанное на основании пункта:"
+        type: text
+        required: true
+        word_tag: "{{P}}"
+
+      - name: prilog_num
+        label: "Приложения номер:"
+        type: text
+        required: true
+        word_tag: "{{N}}"
+      
+      - name: object
+        label: "Подтверждающего Параметры Объекта:"
+        type: text
+        required: true
+        word_tag: "{{O}}"
+
+      - name: dg_day
+        label: "Дата начала действия договора (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{DG_DAY}}"
+          month: "{{DG_MONTH}}"
+          year: "{{DG_YEAR}}"
+      
+      - name: doc
+        label: "Документ, подтверждающий Параметры Объекта"
+        type: text
+        required: true
+        word_tag: "{{DOC}}"
+
+      - name: ip_stamp_abbr
+        label: "Обозначение печати (обычно М.П.)"
+        type: text
+        required: false
+        default: "М.П."
+        word_tag: "{{IP_STAMP_ABBR}}"
+
+  - id: objects
+    title: "Содержание лицензионного пакета (объекты)"
+    type: table
+    table:
+      anchor_type: "tag"
+      anchor_value: "{{OBJ_P}}"
+      row_template: 3
+      allow_dynamic_rows: true
+      min_rows: 1
+      max_rows: 50
+
+      columns:
+        - name: punkt
+          label: "Порядковый номер Объекта"
+          type: text
+          word_tag: "{{OBJ_P}}"
+
+        - name: name
+          label: "Наименование Объекта"
+          type: text
+          word_tag: "{{OBJ_NAME}}"
+
+        - name: address
+          label: "Адрес Объекта"
+          type: text
+          word_tag: "{{OBJ_ADDRESS}}"
+
+        - name: area
+          label: "Параметры объекта"
+          type: number
+          word_tag: "{{OBJ_AREA}}"
+          normalizer: "area_m2"
+
+        - name: staf
+          label: "Базовая ставка"
+          type: text
+          word_tag: "{{OBJ_STAF}}"
+
+        - name: sum
+          label: "Сумма"
+          type: text
+          word_tag: "{{OBJ_SUM}}"
+
+        - name: reg
+          label: "Региональные коэффициенты"
+          type: text
+          word_tag: "{{OBJ_KF_R}}"
+
+        - name: set
+          label: "Сетевые коэффициенты"
+          type: text
+          word_tag: "{{OBJ_KF_S}}"
+
+        - name: period_fee
+          label: "Итого"
+          type: number
+          word_tag: "{{OBJ_PERIOD_FEE}}"
+
+  - id: totals
+    title: "Итоговая сумма по соглашению"
+    fields:
+      - name: total_sum_num
+        label: "Итоговая сумма, руб (цифрами)"
+        type: number
+        required: true
+        word_tag: "{{TOTAL_SUM_NUM}}"
+
+      - name: total_sum_words
+        label: "Итоговая сумма, руб (прописью)"
+        type: text
+        required: true
+        word_tag: "{{TOTAL_SUM_WORDS}}"
+
+      - name: total_kop
+        label: "Итоговая сумма, копейки (цифрами)"
+        type: number
+        required: true
+        word_tag: "{{TOTAL_KOP}}"
+
+  - id: licensee_footer
+    title: "Данные Лицензиата"
+    fields:
+
+      - name: address
+        label: "Место нахождения (юридический адрес)"
+        type: text
+        required: true
+        word_tag: "{{ADDRESS}}"
+
+      - name: pocht
+        label: "Почтовый адрес:"
+        type: text
+        required: true
+        word_tag: "{{POCHT}}"
+
+      - name: ogrn
+        label: "ОГРН"
+        type: text
+        required: true
+        word_tag: "{{OGRN}}"
+
+      - name: inn
+        label: "ИНН"
+        type: text
+        required: true
+        word_tag: "{{INN}}"
+
+      - name: raschet_schet
+        label: "Расчетный счет Лицензиата"
+        type: text
+        required: true
+        word_tag: "{{RASCHECT_SCHET}}"
+
+      - name: bank
+        label: "В каком банке"
+        type: text
+        required: true
+        word_tag: "{{BANK}}"
+
+      - name: bik
+        label: "БИК банка"
+        type: text
+        required: true
+        word_tag: "{{BIK}}"
+
+      - name: kor_schet
+        label: "Корреспондентский счет банка"
+        type: text
+        required: true
+        word_tag: "{{KOR_SCHET}}"
+
+      - name: mail
+        label: "Почта со стороны Лицензиата"
+        type: text
+        required: true
+        word_tag: "{{MAIL}}"
+
+      - name: phone
+        label: "Телефон Лицензиата"
+        type: text
+        required: true
+        word_tag: "{{PHONE}}"

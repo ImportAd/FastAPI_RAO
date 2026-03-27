@@ -1,0 +1,165 @@
+code: fm_sor_ip_s_2017_bd
+name: "Соглашение к ЛД"
+file: "FM_SOR_IP_s_2017_bd.docx"
+
+ui:
+  menu_title: "ФМ-СОР-ИП (долгом)"
+  description: "Формирование соглашения к лицензионному договору с ИП."
+  category: "ФорМакс"
+  subcategory: "СОР"
+# Эти поля присутствуют в шаблоне как теги, но пользователя по ним не спрашиваем
+# (они вычисляются из других значений)
+skip_fields:
+  - sum_words
+  - kop
+
+# Инлайн-значения по умолчанию для отдельных полей (показываются кнопками)
+field_defaults:
+  contract:
+    dov_num:
+      - "232-01/2026-АД"
+    dov_date:
+      - "14.01.2026"
+
+sections:
+  - id: contract
+    title: "Шапка соглашения"
+    fields:
+
+      - name: add_num
+        label: "Номер дополнительного соглашения"
+        type: text
+        required: true
+        word_tag: "{{ADD_NUM}}"
+
+      - name: ld_num
+        label: "Номер лицензионного договора"
+        type: text
+        required: true
+        word_tag: "{{LD_NUM}}"
+
+      - name: ld_day
+        label: "Дата лицензионного договора (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{LD_DAY}}"
+          month: "{{LD_MONTH}}"
+          year: "{{LD_YEAR}}"
+
+      - name: day
+        label: "Дата документа (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{DAY}}"
+          month: "{{MONTH}}"
+          year: "{{YEAR}}"
+
+      - name: dov_num
+        label: "Номер доверенности"
+        type: text
+        required: true
+        word_tag: "{{DOV_NUM}}"
+
+      - name: dov_date
+        label: "Дата доверенности (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{DOV_DATE}}"
+
+      - name: ip_fio
+        label: "ФИО индивидуального предпринимателя (полностью)"
+        type: text
+        required: true
+        text_handler: fio_full_and_initials
+        word_tags:
+          full: "{{IP_FIO}}"
+          initials: "{{FIO_SHORT}}"
+
+      - name: ip_date
+        label: "Лист записи ЕГРИП от (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{IP_DATE}}"
+
+      - name: rast
+        label: "Расторгнуть Договор с (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{R_DAY}}"
+          month: "{{R_MONTH}}"
+          year: "{{R_YEAR}}"
+
+      - name: prekr
+        label: "Права и обязанности прекращаются с (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{P_DAY}}"
+          month: "{{P_MONTH}}"
+          year: "{{P_YEAR}}"
+
+      - name: sum
+        label: "Задолженность по выплате, руб (цифрами)"
+        type: number
+        required: true
+        word_tag: "{{SUM}}"
+
+      - name: sum_words
+        label: "Задолженность по выплате, руб (прописью)"
+        type: text
+        required: true
+        word_tag: "{{SUM_WORDS}}"
+
+      - name: kop
+        label: "Задолженность по выплате, копейки (цифрами)"
+        type: number
+        required: true
+        word_tag: "{{KOP}}"
+
+      - name: bp
+        label: "Выплатить Лицензиару в срок до (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{BP_DAY}}"
+          month: "{{BP_MONTH}}"
+          year: "{{BP_YEAR}}"
+
+  - id: licensee_footer
+    title: "Реквизиты и подпись Лицензиата"
+    fields:
+
+      - name: ogrn
+        label: "ОГРН"
+        type: text
+        required: true
+        word_tag: "{{OGRN}}"
+
+      - name: inn
+        label: "ИНН ИП"
+        type: text
+        required: true
+        word_tag: "{{INN}}"
+
+      - name: address
+        label: "Место нахождения (адрес ИП)"
+        type: text
+        required: true
+        word_tag: "{{ADDRESS}}"
+
+      - name: ip_stamp_abbr
+        label: "Обозначение печати (обычно М.П.)"
+        type: text
+        required: false
+        default: "М.П."
+        word_tag: "{{IP_STAMP_ABBR}}"
