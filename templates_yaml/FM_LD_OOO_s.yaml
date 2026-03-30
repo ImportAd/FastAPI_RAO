@@ -233,7 +233,7 @@ sections:
         word_tag: "{{OGRN}}"
 
       - name: inn
-        label: "ИНН/КПП"
+        label: "ИНН"
         type: text
         required: true
         word_tag: "{{INN}}"
