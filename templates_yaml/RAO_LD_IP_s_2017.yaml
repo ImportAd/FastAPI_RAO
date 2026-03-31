@@ -147,7 +147,7 @@ sections:
 
       columns:
         - name: punkt
-          label: "Порядковый номер Объекта"
+          label: "№ п/п"
           type: text
           word_tag: "{{OBJ_P}}"
 
@@ -178,12 +178,12 @@ sections:
           word_tag: "{{OBJ_SUM}}"
 
         - name: reg
-          label: "Региональные коэффициенты"
+          label: "Региональный коэф."
           type: text
           word_tag: "{{OBJ_KF_R}}"
 
         - name: set
-          label: "Сетевые коэффициенты"
+          label: "Сетевой коэф."
           type: text
           word_tag: "{{OBJ_KF_S}}"
 
@@ -214,7 +214,7 @@ sections:
         word_tag: "{{TOTAL_KOP}}"
 
   - id: licensee_footer
-    title: "Данные Лицензиата"
+    title: "Реквизиты и подпись Лицензиата"
     fields:
 
       - name: address

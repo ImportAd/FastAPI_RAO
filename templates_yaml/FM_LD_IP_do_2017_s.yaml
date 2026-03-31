@@ -127,7 +127,7 @@ sections:
 
       columns:
         - name: category
-          label: "Категория Объекта"
+          label: "Категория объекта"
           type: text
           word_tag: "{{OBJ_CATEGORY}}"
           normalizer: "category_code"
@@ -154,7 +154,7 @@ sections:
           word_tag: "{{OBJ_TARIFF}}"
 
         - name: start_date
-          label: "Дата начала действия Лицензии на Объекте"
+          label: "Дата начала действия"
           type: date
           word_tag: "{{OBJ_START_DATE}}"
           output_format: "ru_date"
@@ -165,7 +165,7 @@ sections:
           word_tag: "{{OBJ_PAYMENT_TERMS}}"
 
         - name: period_fee
-          label: "Лицензионное вознаграждение за Отчетный период"
+          label: "Лицензионное вознаграждение"
           type: number
           word_tag: "{{OBJ_PERIOD_FEE}}"
 
@@ -191,7 +191,7 @@ sections:
         word_tag: "{{TOTAL_KOP}}"
 
   - id: licensee_footer
-    title: "Данные Лицензиата"
+    title: "Реквизиты и подпись Лицензиата"
     fields:
 
       - name: ogrn
