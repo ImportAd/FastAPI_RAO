@@ -71,7 +71,7 @@ sections:
         word_tag: "{{DOV_DATE}}"
 
       - name: form 
-        label: "Форма собственности (ООО, ЗАО и т.д. в полной форме)"
+        label: "Форма собственности (ООО, ЗАО и т.д.)"
         type: text
         required: true
         text_handler: org_form_full_and_abbr
@@ -134,7 +134,7 @@ sections:
           year: "{{DG_YEAR}}"
 
       - name: ip_stamp_abbr
-        label: "Обозначение печати (обычно М.П.)"
+        label: "Обозначение печати"
         type: text
         required: false
         default: "М.П."

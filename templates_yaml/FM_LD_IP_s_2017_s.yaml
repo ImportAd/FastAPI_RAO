@@ -90,7 +90,7 @@ sections:
           year: "{{DG_YEAR}}"
 
       - name: ip_stamp_abbr
-        label: "Обозначение печати (обычно М.П.)"
+        label: "Обозначение печати"
         type: text
         required: false
         default: "М.П."

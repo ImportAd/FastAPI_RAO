@@ -21,7 +21,6 @@ field_defaults:
       - "14.01.2026"
     object:
       - "план БТИ, договор аренды и т.п."
-      - "ввести вручную."
 
 sections:
   - id: contract
@@ -118,7 +117,7 @@ sections:
         word_tag: "{{DOC}}"
 
       - name: ip_stamp_abbr
-        label: "Обозначение печати (обычно М.П.)"
+        label: "Обозначение печати"
         type: text
         required: false
         default: "М.П."

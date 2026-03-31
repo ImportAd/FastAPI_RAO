@@ -25,7 +25,6 @@ field_defaults:
       - "с помощю систем караоке и/или музыкальных автоматов"
     object:
       - "план БТИ, договор аренды и т.п."
-      - "ввести вручную."
 
 sections:
   - id: contract
@@ -128,7 +127,7 @@ sections:
         word_tag: "{{DOC}}"
 
       - name: ip_stamp_abbr
-        label: "Обозначение печати (обычно М.П.)"
+        label: "Обозначение печати"
         type: text
         required: false
         default: "М.П."
