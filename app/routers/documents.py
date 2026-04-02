@@ -92,6 +92,17 @@ async def recent_documents(
     return DocumentsListResponse(documents=items, total=len(items))
 
 
+@router.delete("")
+async def delete_my_documents(
+    user: TokenPayload = Depends(get_current_user),
+):
+    """Удалить все документы текущего пользователя."""
+    if db is None:
+        raise HTTPException(500, "DB not initialized")
+    count = db.delete_user_documents(user.user_id)
+    return {"ok": True, "deleted": count}
+
+
 @router.get("/{doc_id}", response_model=DocumentDetail)
 async def get_document(
     doc_id: int,

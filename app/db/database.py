@@ -333,6 +333,16 @@ class Database:
             return [self._row_to_doc(r) for r in rows]
         finally:
             conn.close()
+    
+    def delete_user_documents(self, user_id: int) -> int:
+        """Удалить все документы пользователя. Возвращает количество удалённых."""
+        conn = self._conn()
+        try:
+            cur = conn.execute("DELETE FROM documents WHERE user_id = ?", (user_id,))
+            conn.commit()
+            return cur.rowcount
+        finally:
+            conn.close()
 
     def get_generation_stats(self) -> dict:
         conn = self._conn()
