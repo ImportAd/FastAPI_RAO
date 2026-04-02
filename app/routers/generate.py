@@ -32,15 +32,18 @@ generated_dir: str = "generated"
 _gen_semaphore = asyncio.Semaphore(1)
 
 FORMAKS_LD_TO_AKT = {
-    "fm_ld_ip_do_2017_POST": "fm_akt_ip_do_2017",
-    "fm_ld_ip_s_2017_POST": "fm_akt_ip_s_2017",
-    "fm_ld_ooo_POST": "fm_akt_OOO",
-    "fm_ld_ip_do_2017": "fm_akt_ip_do_2017",
-    "fm_ld_ip_do_2017_s": "fm_akt_ip_do_2017",
-    "fm_ld_ip_s_2017": "fm_akt_ip_s_2017",
-    "fm_ld_ip_s_2017_s": "fm_akt_ip_s_2017",
-    "fm_ld_ooo": "fm_akt_OOO",
-    "fm_ld_ooo_s": "fm_akt_OOO",
+    # ООО
+    "fm_ld_ooo":              "fm_akt_OOO",       # Постоянный
+    "fm_ld_OOO_post":         "fm_akt_OOO",       # Пост+сезон
+    "fm_ld_OOO_s":            "fm_akt_OOO",       # Сезонный
+    # ИП до 2017
+    "fm_ld_ip_do_2017":       "fm_akt_ip_do_2017", # Постоянный
+    "fm_ld_IP_do_2017_post":  "fm_akt_ip_do_2017", # Пост+сезон
+    "fm_ld_ip_do_2017_s":     "fm_akt_ip_do_2017", # Сезонный
+    # ИП с 2017
+    "ds_ld_ip_s_2017":        "fm_akt_ip_s_2017",  # Постоянный
+    "fm_ld_IP_s_2017_post":   "fm_akt_ip_s_2017",  # Пост+сезон
+    "fm_ld_ip_s_2017":        "fm_akt_ip_s_2017",  # Сезонный
 }
 
 
