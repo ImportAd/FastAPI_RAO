@@ -304,6 +304,12 @@ sections:
         type: text
         required: true
         word_tag: "{{INN}}"
+
+      - name: kpp
+        label: "КПП"
+        type: text
+        required: true
+        word_tag: "{{KPP}}"
       
       - name: address
         label: "Место нахождения (юридический адрес)"
