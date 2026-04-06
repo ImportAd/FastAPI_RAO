@@ -1,0 +1,111 @@
+code: fm_edo_ip_do_2017
+name: "Соглашение о порядке электронного документооборота"
+file: "EDO_IP_do_2017.docx"
+
+ui:
+  menu_title: "ЭДО-ИП-ДО-2017"
+  description: "Соглашение о порядке электронного документооборота с ИП до 2017"
+  category: "ФорМакс"
+  subcategory: "ЭДО"
+# Эти поля присутствуют в шаблоне как теги, но пользователя по ним не спрашиваем
+# (они вычисляются из других значений)
+skip_fields:
+
+# Инлайн-значения по умолчанию для отдельных полей (показываются кнопками)
+field_defaults:
+  contract:
+    dov_num:
+      - "232-01/2026-АД"
+    dov_date:
+      - "14.01.2026"
+
+sections:
+  - id: contract
+    title: "Шапка соглашения"
+    fields:
+
+      - name: day
+        label: "Дата документа (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{DAY}}"
+          month: "{{MONTH}}"
+          year: "{{YEAR}}"
+
+      - name: dov_num
+        label: "Номер доверенности"
+        type: text
+        required: true
+        word_tag: "{{DOV_NUM}}"
+
+      - name: dov_date
+        label: "Дата доверенности (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{DOV_DATE}}"
+
+      - name: ip_fio
+        label: "ФИО индивидуального предпринимателя (полностью)"
+        type: text
+        required: true
+        text_handler: fio_full_and_initials
+        word_tags:
+          full: "{{IP_FIO}}"
+          initials: "{{FIO_SHORT}}"
+
+      - name: ip_cer
+        label: "Серия свидетельства о гос. регистрации ИП"
+        type: text
+        required: true
+        word_tag: "{{IP_CER}}"
+
+      - name: ip_cer_num
+        label: "Номер свидетельства о гос. регистрации ИП"
+        type: text
+        required: true
+        word_tag: "{{IP_CER_NUM}}"
+
+      - name: ip_date
+        label: "Дата свидетельства о гос. регистрации ИП (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{IP_DATE}}"
+
+  - id: licensee_footer
+    title: "Реквизиты и подпись Лицензиата"
+    fields:
+
+      - name: mail
+        label: "Почта со стороны Лицензиата"
+        type: text
+        required: true
+        word_tag: "{{MAIL}}"
+      
+      - name: ogrn
+        label: "ОГРН"
+        type: text
+        required: true
+        word_tag: "{{OGRN}}"
+
+      - name: inn
+        label: "ИНН"
+        type: text
+        required: true
+        word_tag: "{{INN}}"
+
+      - name: address
+        label: "Место нахождения (адрес ИП)"
+        type: text
+        required: true
+        word_tag: "{{ADDRESS}}"
+
+      - name: ip_stamp_abbr
+        label: "Обозначение печати"
+        type: text
+        required: false
+        default: "М.П."
+        word_tag: "{{IP_STAMP_ABBR}}"

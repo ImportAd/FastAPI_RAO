@@ -230,12 +230,6 @@ sections:
         required: true
         word_tag: "{{INN}}"
 
-      - name: kpp
-        label: "КПП"
-        type: text
-        required: true
-        word_tag: "{{KPP}}"
-
       - name: raschet_schet
         label: "Расчетный счет Лицензиата"
         type: text

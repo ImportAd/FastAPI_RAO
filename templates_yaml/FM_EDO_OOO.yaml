@@ -1,0 +1,150 @@
+code: fm_edo_ooo
+name: "Соглашение о порядке электронного документооборота"
+file: "EDO_OOO.docx"
+
+ui:
+  menu_title: "ЭДО-ООО"
+  description: "Соглашение о порядке электронного документооборота с ООО"
+  category: "ФорМакс"
+  subcategory: "ЭДО"
+# Эти поля присутствуют в шаблоне как теги, но пользователя по ним не спрашиваем
+# (они вычисляются из других значений)
+skip_fields:
+
+# Инлайн-значения по умолчанию для отдельных полей (показываются кнопками)
+field_defaults:
+  contract:
+    dov_num:
+      - "232-01/2026-АД"
+    dov_date:
+      - "14.01.2026"
+    ok:
+      - "ий"
+      - "его"
+    dolg:
+      - ""
+    oko:
+      - "ое"
+
+sections:
+  - id: contract
+    title: "Шапка соглашения"
+    fields:
+
+      - name: day
+        label: "Дата документа (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: split_ru_genitive
+        word_tags:
+          day: "{{DAY}}"
+          month: "{{MONTH}}"
+          year: "{{YEAR}}"
+
+      - name: dov_num
+        label: "Номер доверенности"
+        type: text
+        required: true
+        word_tag: "{{DOV_NUM}}"
+
+      - name: dov_date
+        label: "Дата доверенности (формат 01.01.2025)"
+        type: date
+        required: true
+        date_handler: raw
+        word_tag: "{{DOV_DATE}}"
+
+      - name: form 
+        label: "Форма собственности (ООО, ЗАО и т.д.)"
+        type: text
+        required: true
+        text_handler: org_form_full_and_abbr
+        word_tags: 
+          full: "{{FORM}}"
+          abbr: "{{FORM_S}}"
+
+      - name: ooo_name
+        label: "Наименование юр. лица в кавычках"
+        type: text
+        required: true
+        word_tag: "{{OOO_NAME}}"
+      
+      - name: oko
+        label: "именуем(__)"
+        type: text
+        required: true
+        word_tag: "{{OKO}}"
+
+      - name: dol
+        label: "Должность в именительном падеже"
+        type: text
+        required: true
+        text_handler: position_nom_and_gen
+        word_tags: 
+          gen: "{{DOL_GEN}}"
+          nom: "{{DOL}}"
+
+      - name: fio_ooo
+        label: "В лице: ФИО в именительном падеже"
+        type: text
+        required: true
+        text_handler: fio_full_and_initials
+        word_tags:
+          full: "{{FIO_OOO}}"
+          initials: "{{FIO_SHORT}}"
+          gen: "{{FIO_GEN}}"
+
+      - name: ok
+        label: "действующ(__), выберите окончание"
+        type: text
+        required: true
+        word_tag: "{{OK}}"
+
+      - name: osnovanie
+        label: "«Лицензиат» действующий на основании"
+        type: text
+        required: true
+        word_tag: "{{OSNOVANIE}}"
+
+      
+
+  - id: licensee_footer
+    title: "Реквизиты и подпись Лицензиата"
+    fields:
+
+      - name: mail
+        label: "Почта со стороны Лицензиата"
+        type: text
+        required: true
+        word_tag: "{{MAIL}}"
+      
+      - name: ogrn
+        label: "ОГРН"
+        type: text
+        required: true
+        word_tag: "{{OGRN}}"
+
+      - name: inn
+        label: "ИНН"
+        type: text
+        required: true
+        word_tag: "{{INN}}"
+
+      - name: kpp
+        label: "КПП"
+        type: text
+        required: true
+        word_tag: "{{KPP}}"
+
+      - name: address
+        label: "Место нахождения (адрес ИП)"
+        type: text
+        required: true
+        word_tag: "{{ADDRESS}}"
+
+      - name: ip_stamp_abbr
+        label: "Обозначение печати"
+        type: text
+        required: false
+        default: "М.П."
+        word_tag: "{{IP_STAMP_ABBR}}"
