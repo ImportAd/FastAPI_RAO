@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"^\\\\.\\\\/[^/]*\\\\/?$|^\\\\.\\\\/[^/]*/[^/]*\\\\/?$|^\\\\.\\\\/[^/]*/[^/]*/[^/]*\\\\/?$\")",
+      "Bash(grep -r \"fm_akt\\\\|fm_ld\" /c/Users/kfrap_admin/Desktop/FastAPI_RAO/.claude/worktrees/infallible-nobel/templates_yaml/*.yaml)"
+    ]
+  }
+}
