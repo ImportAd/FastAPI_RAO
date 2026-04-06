@@ -4,3 +4,4 @@ data/
 generated/
 static/
 venv/
+.claude/

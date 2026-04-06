@@ -46,6 +46,21 @@ FORMAKS_LD_TO_AKT = {
     "fm_ld_ip_s_2017":        "fm_akt_ip_s_2017",  # Сезонный
 }
 
+FORMAKS_LD_TO_EDO = {
+    # ООО
+    "fm_ld_ooo":              "fm_edo_ooo",
+    "fm_ld_OOO_post":         "fm_edo_ooo",
+    "fm_ld_OOO_s":            "fm_edo_ooo",
+    # ИП до 2017
+    "fm_ld_ip_do_2017":       "fm_edo_ip_do_2017",
+    "fm_ld_IP_do_2017_post":  "fm_edo_ip_do_2017",
+    "fm_ld_ip_do_2017_s":     "fm_edo_ip_do_2017",
+    # ИП с 2017
+    "ds_ld_ip_s_2017":        "fm_edo_ip_s_2017",
+    "fm_ld_IP_s_2017_post":   "fm_edo_ip_s_2017",
+    "fm_ld_ip_s_2017":        "fm_edo_ip_s_2017",
+}
+
 
 @router.post("/generate")
 async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(get_current_user)):
@@ -101,6 +116,26 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
                     filename=akt_path.name, is_auto_generated=True)
         except Exception:
             logging.exception("Auto ACT generation failed (non-critical)")
+        
+    # ФОРМАКС: автоматическая генерация ЭДО
+    edo_filename = None
+    edo_code = FORMAKS_LD_TO_EDO.get(req.template_code)
+    if edo_code and edo_code in templates:
+        try:
+            edo_tmpl = templates[edo_code]
+            edo_answers = copy.deepcopy(answers)
+            apply_template_fixed_fields(edo_tmpl, edo_answers)
+            async with _gen_semaphore:
+                edo_path = await render_document(
+                    template=edo_tmpl, answers=edo_answers,
+                    templates_dir=word_templates_dir, output_dir=generated_dir)
+            edo_filename = edo_path.name
+            if db:
+                db.save_document(user_id=user.user_id, template_code=edo_tmpl.code,
+                    template_title=edo_tmpl.title, answers=edo_answers, status="done",
+                    filename=edo_path.name, is_auto_generated=True)
+        except Exception:
+            logging.exception("Auto EDO generation failed (non-critical)")
 
     result = {
         "status": "ok", "filename": doc_path.name,
@@ -109,6 +144,8 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
     }
     if akt_filename:
         result["akt_filename"] = akt_filename
+    if edo_filename:
+        result["edo_filename"] = edo_filename
     return result
 
 
