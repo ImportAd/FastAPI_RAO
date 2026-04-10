@@ -10,8 +10,11 @@ import time
 from pathlib import Path
 from typing import Dict, Optional
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import FileResponse
+
+from starlette.responses import FileResponse
+from app.services.filename_utils import content_disposition, sanitize_custom_filename
 
 from app.db.database import Database
 from app.models.templates_models import DocumentTemplate
@@ -20,6 +23,7 @@ from app.services.word_renderer import render_document
 from app.services.business_logic import (
     apply_template_fixed_fields, apply_computed_totals, apply_computed_sum_fields,
 )
+from app.services.filename_utils import sanitize_custom_filename, add_suffix
 from app.routers.auth import get_current_user, TokenPayload
 
 router = APIRouter(prefix="/api/v1", tags=["generate"])
@@ -72,6 +76,13 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
     apply_template_fixed_fields(template, answers)
     apply_computed_totals(answers)
     apply_computed_sum_fields(answers)
+    # Достать пользовательское имя ДО удаления _meta
+    meta = answers.get("_meta") or {}
+    raw_custom = meta.get("custom_filename")
+    custom_filename = sanitize_custom_filename(raw_custom)
+
+    # _meta — служебный ключ, не должен попадать в рендер-контекст
+    answers.pop("_meta", None)
 
     async with _gen_semaphore:
         t0 = time.perf_counter()
@@ -95,10 +106,12 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
         doc_record = db.save_document(
             user_id=user.user_id, template_code=template.code,
             template_title=template.title, answers=answers, status="done",
-            generation_time_ms=gen_time_ms, filename=doc_path.name)
+            generation_time_ms=gen_time_ms, filename=doc_path.name, 
+            display_filename=custom_filename,)
 
     # ФОРМАКС: автоматическая генерация АКТа
     akt_filename = None
+    akt_display = ""
     akt_code = FORMAKS_LD_TO_AKT.get(req.template_code)
     if akt_code and akt_code in templates:
         try:
@@ -110,15 +123,18 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
                     template=akt_tmpl, answers=akt_answers,
                     templates_dir=word_templates_dir, output_dir=generated_dir)
             akt_filename = akt_path.name
+            akt_display = add_suffix(custom_filename, "_АКТ") if custom_filename else ""
             if db:
                 db.save_document(user_id=user.user_id, template_code=akt_tmpl.code,
                     template_title=akt_tmpl.title, answers=akt_answers, status="done",
-                    filename=akt_path.name, is_auto_generated=True)
+                    filename=akt_path.name, is_auto_generated=True,
+                    display_filename=akt_display)
         except Exception:
             logging.exception("Auto ACT generation failed (non-critical)")
         
     # ФОРМАКС: автоматическая генерация ЭДО
     edo_filename = None
+    edo_display = ""
     edo_code = FORMAKS_LD_TO_EDO.get(req.template_code)
     if edo_code and edo_code in templates:
         try:
@@ -130,10 +146,12 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
                     template=edo_tmpl, answers=edo_answers,
                     templates_dir=word_templates_dir, output_dir=generated_dir)
             edo_filename = edo_path.name
+            edo_display = add_suffix(custom_filename, "_EDO") if custom_filename else ""
             if db:
                 db.save_document(user_id=user.user_id, template_code=edo_tmpl.code,
                     template_title=edo_tmpl.title, answers=edo_answers, status="done",
-                    filename=edo_path.name, is_auto_generated=True)
+                    filename=edo_path.name, is_auto_generated=True,
+                    display_filename=edo_display)
         except Exception:
             logging.exception("Auto EDO generation failed (non-critical)")
 
@@ -144,15 +162,47 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
     }
     if akt_filename:
         result["akt_filename"] = akt_filename
+        if akt_display:
+            result["akt_display_filename"] = akt_display
     if edo_filename:
         result["edo_filename"] = edo_filename
+        if edo_display:
+            result["edo_display_filename"] = edo_display
     return result
 
 
 @router.get("/download/{filename}")
-async def download_file(filename: str, user: TokenPayload = Depends(get_current_user)):
+async def download_file(filename: str, 
+                        display: str | None = Query(None),
+                        user: TokenPayload = Depends(get_current_user),
+                        ):
     file_path = Path(generated_dir) / filename
     if not file_path.exists():
         raise HTTPException(404, "Файл не найден")
-    return FileResponse(path=str(file_path), filename=filename,
-        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+    # Если фронт явно передал display — санитизируем; иначе ищем в БД
+    display_name = ""
+    if display:
+        display_name = sanitize_custom_filename(display)
+    if not display_name and db:
+        # Найти запись по filename
+        from sqlite3 import Row  # noqa
+        conn = db._conn()
+        try:
+            row = conn.execute(
+                "SELECT display_filename FROM documents WHERE filename = ? LIMIT 1",
+                (filename,),
+            ).fetchone()
+            if row and row["display_filename"]:
+                display_name = row["display_filename"]
+        finally:
+            conn.close()
+
+    if not display_name:
+        display_name = filename
+
+    response = FileResponse(
+        path=str(file_path),
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    )
+    response.headers["Content-Disposition"] = content_disposition(display_name)
+    return response

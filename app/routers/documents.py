@@ -26,6 +26,7 @@ class DocumentListItem(BaseModel):
     status: str
     generation_time_ms: int
     filename: str
+    display_filename: str = ""
     created_at: str
 
 
@@ -36,6 +37,7 @@ class DocumentDetail(BaseModel):
     status: str
     generation_time_ms: int
     filename: str
+    display_filename: str = ""
     created_at: str
     answers: dict  # Полный снимок полей для повторного заполнения
 
@@ -62,6 +64,7 @@ async def list_my_documents(
             status=d.status,
             generation_time_ms=d.generation_time_ms,
             filename=d.filename,
+            display_filename=d.display_filename,
             created_at=d.created_at,
         )
         for d in docs
@@ -85,6 +88,7 @@ async def recent_documents(
             status=d.status,
             generation_time_ms=d.generation_time_ms,
             filename=d.filename,
+            display_filename=d.display_filename,
             created_at=d.created_at,
         )
         for d in docs
@@ -124,6 +128,7 @@ async def get_document(
         status=doc.status,
         generation_time_ms=doc.generation_time_ms,
         filename=doc.filename,
+        display_filename=doc.display_filename,
         created_at=doc.created_at,
         answers=doc.answers,
     )

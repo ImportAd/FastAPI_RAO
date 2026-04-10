@@ -62,6 +62,7 @@ class DocumentRecord:
     filename: str = ""
     created_at: str = ""
     is_auto_generated: bool = False  # True for auto-generated ACTs
+    display_filename: str = ""
 
     @property
     def answers(self) -> Dict[str, Any]:
@@ -80,6 +81,7 @@ class DocumentRecord:
             "error_text": self.error_text,
             "generation_time_ms": self.generation_time_ms,
             "filename": self.filename,
+            "display_filename": self.display_filename,
             "created_at": self.created_at,
             "is_auto_generated": self.is_auto_generated,
         }
@@ -132,6 +134,7 @@ class Database:
                     created_at TEXT NOT NULL,
                     is_auto_generated INTEGER NOT NULL DEFAULT 0,
                     FOREIGN KEY (user_id) REFERENCES users(id)
+                    display_filename TEXT NOT NULL DEFAULT '',
                 );
 
                 CREATE INDEX IF NOT EXISTS idx_documents_user
@@ -140,6 +143,12 @@ class Database:
                 CREATE INDEX IF NOT EXISTS idx_documents_status
                     ON documents(status);
             """)
+            cur = conn.execute("PRAGMA table_info(documents)")
+            cols = {row[1] for row in cur.fetchall()}
+            if "display_filename" not in cols:
+                conn.execute(
+                    "ALTER TABLE documents ADD COLUMN display_filename TEXT NOT NULL DEFAULT ''"
+                )
             conn.commit()
         finally:
             conn.close()
@@ -257,6 +266,7 @@ class Database:
         generation_time_ms: int = 0,
         filename: str = "",
         is_auto_generated: bool = False,
+        display_filename: str = "",
     ) -> DocumentRecord:
         now = _now_iso()
         answers_json = json.dumps(answers, ensure_ascii=False)
@@ -265,11 +275,11 @@ class Database:
             cur = conn.execute(
                 "INSERT INTO documents "
                 "(user_id, template_code, template_title, answers_json, status, "
-                "error_text, generation_time_ms, filename, created_at, is_auto_generated) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                "error_text, generation_time_ms, filename, created_at, is_auto_generated, display_filename) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (user_id, template_code, template_title, answers_json,
                  status, error_text, generation_time_ms, filename, now,
-                 1 if is_auto_generated else 0),
+                 1 if is_auto_generated else 0, display_filename),
             )
             conn.commit()
             return DocumentRecord(
@@ -284,6 +294,7 @@ class Database:
                 filename=filename,
                 created_at=now,
                 is_auto_generated=is_auto_generated,
+                display_filename=display_filename,
             )
         finally:
             conn.close()
