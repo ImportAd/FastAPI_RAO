@@ -4,6 +4,7 @@ from __future__ import annotations
 import re
 import unicodedata
 from urllib.parse import quote
+from typing import Optional
 
 # Запрещённые символы (Windows + Unix) + управляющие
 _FORBIDDEN = re.compile(r'[\\/:*?"<>|\x00-\x1f]')
@@ -17,7 +18,7 @@ _WIN_RESERVED = {
 MAX_LEN = 150  # без расширения
 
 
-def sanitize_custom_filename(raw: str | None) -> str:
+def sanitize_custom_filename(raw: Optional[str]) -> str:
     """Очистить пользовательское имя файла.
 
     Возвращает имя с расширением .docx или пустую строку, если входное пустое/мусор.

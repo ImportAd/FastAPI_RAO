@@ -173,7 +173,7 @@ async def generate_document(req: GenerateRequest, user: TokenPayload = Depends(g
 
 @router.get("/download/{filename}")
 async def download_file(filename: str, 
-                        display: str | None = Query(None),
+                        display: Optional[str] = Query(None),
                         user: TokenPayload = Depends(get_current_user),
                         ):
     file_path = Path(generated_dir) / filename
