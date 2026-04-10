@@ -133,8 +133,8 @@ class Database:
                     filename TEXT NOT NULL DEFAULT '',
                     created_at TEXT NOT NULL,
                     is_auto_generated INTEGER NOT NULL DEFAULT 0,
-                    FOREIGN KEY (user_id) REFERENCES users(id)
                     display_filename TEXT NOT NULL DEFAULT '',
+                    FOREIGN KEY (user_id) REFERENCES users(id)
                 );
 
                 CREATE INDEX IF NOT EXISTS idx_documents_user
