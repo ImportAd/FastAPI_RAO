@@ -62,6 +62,13 @@ sections:
         required: true
         date_handler: raw
         word_tag: "{{IP_DATE}}"
+      
+      - name: ip_stamp_abbr
+        label: "Обозначение печати"
+        type: text
+        required: false
+        default: "М.П."
+        word_tag: "{{IP_STAMP_ABBR}}"
 
   - id: licensee_footer
     title: "Реквизиты и подпись Лицензиата"
@@ -91,9 +98,4 @@ sections:
         required: true
         word_tag: "{{ADDRESS}}"
 
-      - name: ip_stamp_abbr
-        label: "Обозначение печати"
-        type: text
-        required: false
-        default: "М.П."
-        word_tag: "{{IP_STAMP_ABBR}}"
+      

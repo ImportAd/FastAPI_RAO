@@ -91,14 +91,16 @@ sections:
           day: "{{LD_DAY}}"
           month: "{{LD_MONTH}}"
           year: "{{LD_YEAR}}"
-
-  - id: licensee_footer
-    title: "Реквизиты и подпись Лицензиата"
-    fields:
-
+        
       - name: ip_stamp_abbr
         label: "Обозначение печати"
         type: text
         required: false
         default: "М.П."
         word_tag: "{{IP_STAMP_ABBR}}"
+
+  # - id: contract
+  #   title: "Реквизиты и подпись Лицензиата"
+  #   fields:
+
+      
